@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>Dashboard</h1>
+
+    <!-- Display Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                {# Ensure you have CSS styles for these alert classes in static/style.css #}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <!-- End Flash Messages -->
+
+    {% if current_user.is_authenticated %}
+        <h2>Welcome, {{ current_user.username }}!</h2>
+
+        <!-- Recent Entries Summary -->
+        <h3>Your Most Recent Entries:</h3>
+        {% if entries %}
+            <ul class="entry-list-summary">
+                {% for entry in entries %}
+                    <li>
+                        <div class="entry-header"> <!-- Re-using header for date -->
+                            <strong>{{ entry.date.strftime('%Y-%m-%d') }}</strong>
+                        </div>
+                        <div class="entry-details">
+                            {% if entry.weight_kg is not none %}
+                                <span>Weight: {{ "%.1f"|format(entry.weight_kg) }} kg</span>
+                            {% endif %}
+                            {% if entry.systolic_bp is not none and entry.diastolic_bp is not none %}
+                                <span>BP: {{ entry.systolic_bp }}/{{ entry.diastolic_bp }} mmHg</span>
+                            {% elif entry.systolic_bp is not none %}
+                                <span>BP (Systolic): {{ entry.systolic_bp }} mmHg</span>
+                            {% elif entry.diastolic_bp is not none %}
+                                <span>BP (Diastolic): {{ entry.diastolic_bp }} mmHg</span>
+                            {% endif %}
+                            {% if entry.sleep_hours is not none %}
+                                <span>Sleep: {{ "%.1f"|format(entry.sleep_hours) }} hrs</span>
+                            {% endif %}
+                        </div>
+                        <div class="entry-actions"> <!-- Container for actions -->
+                           <a href="{{ url_for('history') }}">View All</a>
+                           <!-- Add links for specific entry view/edit/delete here if implemented -->
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No health entries yet. <a href="{{ url_for('add_entry') }}">Add your first entry!</a></p>
+        {% endif %}
+
+        <!-- Trend Preview Section -->
+        <div class="trend-preview">
+            <h3>Weight Trend Preview (Last 30 Days)</h3>
+            <div class="chart-container">
+                {# Canvas element for Chart.js #}
+                <canvas id="weightChartPreview"></canvas>
+            </div>
+            <p><a href="{{ url_for('trends', metric='weight') }}">View Full Trend Analysis</a></p>
+        </div>
+
+        {# JavaScript for Chart.js initialization #}
+        <script>
+            // Get data passed from Flask route
+            const chartDates = {{ chart_dates | tojson }};
+            const chartValues = {{ chart_values | tojson }};
+
+            // Only draw the chart if we have data
+            if (chartDates.length > 0) {
+                const ctxPreview = document.getElementById('weightChartPreview').getContext('2d');
+                const weightChartPreview = new Chart(ctxPreview, {
+                    type: 'line',
+                    data: {
+                        labels: chartDates, // Dates for the X-axis
+                        datasets: [{
+                            label: 'Weight (kg)',
+                            data: chartValues, // Weight values for the Y-axis
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            fill: false,
+                            tension: 0.1 // Makes the line slightly curved
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: false, // Don't force Y-axis to start at 0
+                                title: { display: true, text: 'Weight (kg)' } // Label for Y-axis
+                            },
+                            x: {
+                                title: { display: true, text: 'Date' } // Label for X-axis
+                            }
+                        },
+                        responsive: true,
+                        maintainAspectRatio: false // Allows chart to fit container dimensions
+                    }
+                });
+            } else {
+                // If no data is available, display a message within the chart container
+                const chartContainer = document.querySelector('.chart-container');
+                chartContainer.innerHTML = '<p class="no-data-message">No weight data available for the last 30 days.</p>';
+            }
+        </script>
+
+    {% else %}
+        <!-- View for users who are not logged in -->
+        <p>Welcome to the Health Tracker!</p>
+        <p>Please <a href="{{ url_for('login') }}">Login</a> or <a href="{{ url_for('register') }}">Register</a> to get started.</p>
+    {% endif %} {# End of {% if current_user.is_authenticated %} #}
+{% endblock %}

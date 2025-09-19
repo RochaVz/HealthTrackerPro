@@ -1,0 +1,310 @@
+body {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f7f6;
+    color: #333;
+}
+
+header {
+    background-color: #4CAF50; /* Green theme */
+    color: white;
+    padding: 10px 0;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    margin: 0 15px;
+    font-weight: bold;
+}
+
+nav a:hover {
+    text-decoration: underline;
+}
+
+main {
+    padding: 20px;
+    max-width: 960px;
+    margin: 20px auto;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+h1, h2 {
+    color: #333;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    margin-top: 40px;
+    color: #777;
+    font-size: 0.9em;
+}
+
+/* Forms */
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="date"],
+textarea,
+select {
+    width: calc(100% - 20px); /* Adjust width considering padding */
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+/* History list */
+.entry-list {
+    list-style: none;
+    padding: 0;
+}
+
+.entry-list li {
+    background-color: #e8f5e9; /* Light green background */
+    border: 1px solid #c8e6c9;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap; /* For responsiveness */
+}
+
+.entry-list li strong {
+    flex-basis: 100%; /* Date takes full width on small screens */
+    margin-bottom: 5px;
+    color: #2e7d32;
+}
+
+.entry-details {
+    flex-grow: 1;
+    margin-right: 15px;
+}
+
+.entry-details span {
+    margin-right: 15px;
+}
+
+/* Chart container */
+.chart-container {
+    width: 80%; /* Adjust as needed */
+    max-width: 800px; /* Max width for very large screens */
+    margin: 20px auto;
+    height: 400px; /* Fixed height for the canvas */
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.chart-container h2 {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+canvas {
+    width: 100% !important; /* Ensure canvas fills container width */
+    height: 100% !important; /* Ensure canvas fills container height */
+}
+
+.no-data-message {
+    text-align: center;
+    margin-top: 30px;
+    color: #888;
+    font-style: italic;
+}
+
+/* --- Flash Messages --- */
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: #31708f; /* Default text color */
+    background-color: #d9edf7; /* Default background */
+    border-color: #bce8f1;
+}
+
+.alert-success {
+    color: #3c763d;
+    background-color: #dff0d8;
+    border-color: #d6e9c6;
+}
+
+.alert-info {
+    color: #31708f;
+    background-color: #d9edf7;
+    border-color: #bce8f1;
+}
+
+.alert-warning {
+    color: #8a6d3b;
+    background-color: #fcf8e3;
+    border-color: #faebcc;
+}
+
+.alert-danger { /* Used for errors, though we're using 'error' directly in add_entry.html */
+    color: #a94442;
+    background-color: #f2dede;
+    border-color: #ebccd1;
+}
+
+
+/* --- History List Styles (for index and history pages) --- */
+.entry-list, .entry-list-summary {
+    list-style: none;
+    padding: 0;
+}
+
+.entry-list li, .entry-list-summary li {
+    background-color: #e8f5e9; /* Light green background */
+    border: 1px solid #c8e6c9;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column; /* Stack items vertically by default */
+    align-items: flex-start; /* Align items to the start */
+}
+
+.entry-list li:last-child, .entry-list-summary li:last-child {
+    margin-bottom: 0;
+}
+
+.entry-header { /* For History page full view */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.entry-header strong {
+    color: #2e7d32;
+}
+
+.entry-details {
+    font-size: 0.95em;
+    flex-grow: 1;
+}
+
+.entry-details span, .entry-details div {
+    display: inline-block; /* Allows them to sit side-by-side on wider screens */
+    margin-right: 15px;
+    margin-bottom: 5px; /* Space between lines if they wrap */
+}
+
+.entry-notes p {
+    margin-top: 5px;
+    margin-bottom: 0;
+    padding-left: 10px; /* Indent notes */
+    border-left: 2px solid #2e7d32;
+    color: #444;
+    font-style: italic;
+}
+
+/* Adjustments for summary list on dashboard */
+.entry-list-summary li {
+    flex-direction: row; /* Arrange items horizontally */
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.entry-list-summary li .entry-header {
+    margin-bottom: 0;
+    flex-basis: 100%; /* Date takes full width on small screens */
+    margin-bottom: 5px;
+}
+
+.entry-list-summary li .entry-details {
+    display: flex;
+    flex-wrap: wrap; /* Allow details to wrap */
+    gap: 10px; /* Space between detail items */
+}
+
+.entry-list-summary a {
+    margin-left: auto; /* Push link to the right */
+    color: #4CAF50;
+    text-decoration: none;
+    font-weight: bold;
+}
+.entry-list-summary a:hover {
+    text-decoration: underline;
+}
+
+
+/* --- Trend Preview Section --- */
+.trend-preview {
+    margin-top: 30px;
+    text-align: center;
+    border-top: 1px solid #eee;
+    padding-top: 20px;
+}
+
+.trend-preview h3 {
+    margin-bottom: 15px;
+}
+
+.trend-preview p a {
+    color: #4CAF50;
+    text-decoration: none;
+    font-weight: bold;
+}
+.trend-preview p a:hover {
+    text-decoration: underline;
+}
+
+/* --- Chart Container Styles --- */
+.chart-container {
+    width: 100%; /* Occupy full width of its parent */
+    max-width: 800px; /* Max width for very large screens */
+    margin: 20px auto;
+    height: 350px; /* Adjust height as needed */
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    position: relative; /* Needed for Chart.js responsive sizing */
+}
+
+canvas {
+    display: block; /* Ensure canvas is block level */
+    width: 100% !important; /* Override Chart.js defaults if they restrict size */
+    height: 100% !important;
+}
+
+.no-data-message { /* Style for messages when no data is available */
+    text-align: center;
+    margin-top: 30px;
+    color: #888;
+    font-style: italic;
+}

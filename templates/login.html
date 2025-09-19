@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>Login</h1>
+
+    {% if error %}
+        {# Display any login errors passed from the Flask route #}
+        <p style="color: red;"><strong>Error:</strong> {{ error }}</p>
+    {% endif %}
+
+    <form action="{{ url_for('login') }}" method="post">
+        <div>
+            <label for="username">Username:</label>
+            {# The value="{{ username }}" pre-fills the field if there was an error #}
+            <input type="text" id="username" name="username" value="{{ username }}" required>
+        </div>
+        <div>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <div>
+            {# 'remember' checkbox for "Remember Me" functionality #}
+            <input type="checkbox" id="remember" name="remember">
+            <label for="remember">Remember Me</label>
+        </div>
+        <button type="submit">Login</button>
+    </form>
+
+    <p>Don't have an account? <a href="{{ url_for('register') }}">Register here!</a></p>
+{% endblock %}

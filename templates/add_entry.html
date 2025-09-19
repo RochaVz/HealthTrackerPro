@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>Add New Health Entry</h1>
+
+    {% if error %}
+        <p style="color: red;"><strong>Error:</strong> {{ error }}</p>
+    {% endif %}
+
+    <form action="{{ url_for('add_entry') }}" method="post">
+        <div>
+            <label for="date">Date:</label>
+            <!-- Default the date to today's date -->
+            <input type="date" id="date" name="date" value="{{ today }}" required>
+        </div>
+
+        <div>
+            <label for="weight_kg">Weight (kg):</label>
+            <input type="number" id="weight_kg" name="weight_kg" step="0.1" min="0" placeholder="e.g., 70.5">
+        </div>
+
+        <div>
+            <label for="systolic_bp">Blood Pressure (Systolic):</label>
+            <input type="number" id="systolic_bp" name="systolic_bp" min="0" max="300" placeholder="e.g., 120">
+            <span> / </span>
+            <label for="diastolic_bp">Diastolic:</label>
+            <input type="number" id="diastolic_bp" name="diastolic_bp" min="0" max="200" placeholder="e.g., 80">
+        </div>
+
+        <div>
+            <label for="sleep_hours">Sleep Duration (hours):</label>
+            <input type="number" id="sleep_hours" name="sleep_hours" step="0.5" min="0" max="24" placeholder="e.g., 7.5">
+        </div>
+
+        <div>
+            <label for="notes">Notes (Optional):</label>
+            <textarea id="notes" name="notes" rows="4" placeholder="e.g., Felt tired today, ate a large dinner..."></textarea>
+        </div>
+
+        <button type="submit">Save Entry</button>
+    </form>
+{% endblock %}

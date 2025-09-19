@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>Health Entry History</h1>
+
+    {% if not entries %}
+        <p class="no-data-message">No health entries recorded yet. <a href="{{ url_for('add_entry') }}">Add your first entry!</a></p>
+    {% else %}
+        <ul class="entry-list">
+            {% for entry in entries %}
+                <li>
+                    <div class="entry-header">
+                        <strong>{{ entry.date.strftime('%Y-%m-%d') }}</strong>
+                        <!-- Optional: Add edit/delete links here later -->
+                    </div>
+                    <div class="entry-details">
+                        {% if entry.weight_kg is not none %}
+                            <span><strong>Weight:</strong> {{ "%.1f"|format(entry.weight_kg) }} kg</span>
+                        {% endif %}
+                        {% if entry.systolic_bp is not none and entry.diastolic_bp is not none %}
+                            <span><strong>BP:</strong> {{ entry.systolic_bp }}/{{ entry.diastolic_bp }} mmHg</span>
+                        {% elif entry.systolic_bp is not none %}
+                            <span><strong>BP (Systolic):</strong> {{ entry.systolic_bp }} mmHg</span>
+                        {% elif entry.diastolic_bp is not none %}
+                            <span><strong>BP (Diastolic):</strong> {{ entry.diastolic_bp }} mmHg</span>
+                        {% endif %}
+                        {% if entry.sleep_hours is not none %}
+                            <span><strong>Sleep:</strong> {{ "%.1f"|format(entry.sleep_hours) }} hrs</span>
+                        {% endif %}
+                        
+                        {% if entry.notes %}
+                            <div class="entry-notes">
+                                <strong>Notes:</strong>
+                                <p>{{ entry.notes }}</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endblock %}

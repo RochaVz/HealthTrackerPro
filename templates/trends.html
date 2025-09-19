@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>Trends</h1>
+    
+    <form action="{{ url_for('trends') }}" method="get">
+        <label for="metric">Select Metric:</label>
+        <select name="metric" id="metric" onchange="this.form.submit()"> {# Auto-submit on change #}
+            <option value="weight" {% if metric == 'weight' %}selected{% endif %}>Weight</option>
+            <option value="bp_systolic" {% if metric == 'bp_systolic' %}selected{% endif %}>Systolic BP</option>
+            <option value="bp_diastolic" {% if metric == 'bp_diastolic' %}selected{% endif %}>Diastolic BP</option>
+            <option value="sleep_hours" {% if metric == 'sleep_hours' %}selected{% endif %}>Sleep Hours</option>
+        </select>
+    </form>
+
+    {% if dates and values %} {# Only show chart if we have data #}
+        <div style="width: 80%; margin: 20px auto;">
+            <h2>{{ title }}</h2>
+            <canvas id="metricChart"></canvas>
+        </div>
+
+        <script>
+            const ctx = document.getElementById('metricChart').getContext('2d');
+            const chartData = {
+                labels: {{ dates | tojson }}, // Pass Python list to JS array
+                datasets: [{
+                    label: '{{ title }}',
+                    data: {{ values | tojson }}, // Pass Python list to JS array
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    fill: false,
+                    tension: 0.1 // Slightly curved lines
+                }]
+            };
+            
+            const chartOptions = {
+                scales: {
+                    y: {
+                        beginAtZero: false, // Adjust based on your data
+                        title: {
+                            display: true,
+                            text: '{{ ylabel }}'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Date'
+                        }
+                    }
+                },
+                responsive: true,
+                maintainAspectRatio: false // Allow chart to resize freely
+            };
+
+            const metricChart = new Chart(ctx, {
+                type: 'line',
+                data: chartData,
+                options: chartOptions
+            });
+        </script>
+    {% elif metric_selected %} {# If user selected a metric but no data found #}
+        <p style="text-align: center; margin-top: 20px;">No data available for {{ metric.replace('_', ' ').title() }} for the selected period.</p>
+    {% else %} {# Initial load without any metric selected yet #}
+        <p style="text-align: center; margin-top: 20px;">Select a metric from the dropdown to see its trend.</p>
+    {% endif %}
+
+{% endblock %}
