@@ -1,79 +1,87 @@
 {% extends 'base.html' %}
-{% block title %}Add Health Entry{% endblock %}
+{% block title %}Edit Health Entry{% endblock %}
 
 {% block content %}
 <div class="container">
-    <h2>Add New Health Entry</h2>
+    <h2>Edit Health Entry</h2>
 
-    {# Display any generic errors passed from the route #}
+    {# Display any generic errors passed from the route, or use specific field errors below #}
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             {% for category, message in messages %}
+                {# Use Bootstrap alert classes for styling flash messages #}
                 <div class="alert alert-{{ category }}">{{ message }}</div>
             {% endfor %}
         {% endif %}
     {% endwith %}
 
-    {# Form for adding a new health entry #}
-    <form action="{{ url_for('add_entry') }}" method="post">
-        {{ form.hidden_tag() }} {# CSRF token #}
+    {# The form tag MUST have the correct action, method, and hidden_tag for CSRF #}
+    {# The action now correctly points to the edit_entry route with the entry_id #}
+    <form action="{{ url_for('edit_entry', entry_id=entry.id) }}" method="post">
+        {# This renders the CSRF token input field - ESSENTIAL #}
+        {{ form.hidden_tag() }}
+
+        {# --- Render Form Fields --- #}
 
         <div class="form-group">
             {{ form.date.label(class="form-label") }}
+            {# WTForms automatically populates this field with the existing entry's data from 'obj=entry' #}
             {{ form.date(class="form-control", type="date") }}
-            {% for error in form.date.errors %}
+            {% for error in form.date.errors %} {# Start for loop #}
                 <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
+            {% endfor %} {# End for loop #}
         </div>
         <br>
 
         <div class="form-group">
             {{ form.weight_kg.label(class="form-label") }}
             {{ form.weight_kg(class="form-control") }}
-            {% for error in form.weight_kg.errors %}
+            {% for error in form.weight_kg.errors %} {# Start for loop #}
                 <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
+            {% endfor %} {# End for loop #}
         </div>
         <br>
 
         <div class="form-group">
             {{ form.systolic_bp.label(class="form-label") }}
             {{ form.systolic_bp(class="form-control") }}
-            {% for error in form.systolic_bp.errors %}
+            {% for error in form.systolic_bp.errors %} {# Start for loop #}
                 <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
+            {% endfor %} {# End for loop - CHECK THIS ONE CAREFULLY #}
         </div>
         <br>
 
         <div class="form-group">
             {{ form.diastolic_bp.label(class="form-label") }}
             {{ form.diastolic_bp(class="form-control") }}
-            {% for error in form.diastolic_bp.errors %}
+            {% for error in form.diastolic_bp.errors %} {# Start for loop #}
                 <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
+            {% endfor %} {# End for loop #}
         </div>
         <br>
 
         <div class="form-group">
             {{ form.sleep_hours.label(class="form-label") }}
             {{ form.sleep_hours(class="form-control") }}
-            {% for error in form.sleep_hours.errors %}
+            {% for error in form.sleep_hours.errors %} {# Start for loop #}
                 <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
+            {% endfor %} {# End for loop #}
         </div>
         <br>
 
         <div class="form-group">
             {{ form.notes.label(class="form-label") }}
+            {# Textarea fields are rendered as <textarea>...</textarea> by WTForms #}
             {{ form.notes(class="form-control", rows=4) }}
-            {% for error in form.notes.errors %}
+            {% for error in form.notes.errors %} {# Start for loop #}
                 <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
+            {% endfor %} {# End for loop #}
         </div>
         <br>
 
+        {# Submit and Cancel buttons #}
         {{ form.submit(class="btn btn-primary") }}
-        <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancel</a>
+        <a href="{{ url_for('history') }}" class="btn btn-secondary">Cancel</a>
     </form>
 </div>
 {% endblock %}

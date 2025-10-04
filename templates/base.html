@@ -3,46 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Health Tracker</title>
+    <title>{% block title %}Health Tracker{% endblock %}</title>
+
+    {# --- CSS --- #}
+    {# Bootstrap CSS for a responsive and modern look #}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    {# Your custom CSS - should be linked *after* Bootstrap to allow overriding #}
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    {# --- JavaScript for Charts --- #}
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    {# Add any other JS libraries here if needed #}
 </head>
 <body>
+
     <header>
-        <nav>
-            {% if current_user.is_authenticated %}
-                <!-- Logged-in user navigation -->
-                <a href="{{ url_for('index') }}">Dashboard</a> |
-                <a href="{{ url_for('add_entry') }}">Add Entry</a> |
-                <a href="{{ url_for('history') }}">History</a> |
-                <a href="{{ url_for('trends') }}">Trends</a> |
-                <span>Hello, {{ current_user.username }}!</span> |
-                <a href="{{ url_for('logout') }}">Logout</a>
-            {% else %}
-                <!-- Guest user navigation -->
-                <a href="{{ url_for('login') }}">Login</a> |
-                <a href="{{ url_for('register') }}">Register</a>
-            {% endif %}
+        <nav class="navbar navbar-expand-lg navbar-light bg-light py-3"> {# Added Bootstrap classes for styling #}
+            <div class="container"> {# Container for content alignment #}
+                <a class="navbar-brand" href="{{ url_for('index') }}">Health Tracker</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0"> {# Navigation links for logged-in users #}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('index') }}">Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('add_entry') }}">Add Entry</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('history') }}">History</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('trends') }}">Trends</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('medications') }}">Medications</a>
+                        </li>
+                    </ul>
+                    {# Navigation for guest users, placed separately or conditionally shown #}
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                        {% if current_user.is_authenticated %}
+                            <li class="nav-item"><span class="navbar-text me-3">Hello, {{ current_user.username }}!</span></li>
+                            <li class="nav-item">
+                                <a class="nav-link btn btn-outline-secondary btn-sm" href="{{ url_for('logout') }}">Logout</a>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link btn btn-outline-primary btn-sm me-2" href="{{ url_for('login') }}">Login</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link btn btn-primary btn-sm" href="{{ url_for('register') }}">Register</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
         </nav>
     </header>
 
     {# --- FLASH MESSAGE DISPLAY --- #}
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                {# This div will display messages like "Login successful!" or "Username not found." #}
-                <div class="alert alert-{{ category }}">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
+    <div class="container mt-3"> {# Wrap flash messages in a container for consistent spacing #}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    {# Using Bootstrap's alert classes for styling #}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
     {# --- END FLASH MESSAGE DISPLAY --- #}
 
-    <main>
-        {% block content %}{% endblock %} {# Content from specific pages like login.html goes here #}
+    {# --- MAIN CONTENT BLOCK --- #}
+    <main class="container py-4"> {# Add container and padding to main content area #}
+        {% block content %}{% endblock %}
     </main>
+    {# --- END MAIN CONTENT BLOCK --- #}
 
     <footer>
-        <p>&copy; 2023 Health Tracker MVP</p>
+        <div class="text-center p-4 mt-5 bg-light"> {# Bootstrap classes for footer styling #}
+            <p class="mb-0">&copy; {{ now.year }} Health Tracker MVP</p> {# Dynamic year using a context processor if needed, or pass 'now' variable #}
+        </div>
     </footer>
+
+    {# --- JAVASCRIPT --- #}
+    {# Bootstrap Bundle includes Popper.js and all of Bootstrap's JavaScript plugins #}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcz78jJ2Qp135U" crossorigin="anonymous"></script>
+    {# Your custom JavaScript file #}
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+
+    {# Block for page-specific JavaScript if needed #}
+    {% block scripts %}{% endblock %}
+
 </body>
 </html>

@@ -2,30 +2,55 @@
 {% block content %}
     <h1>Register</h1>
 
+    {# Note: While 'error' is passed, WTForms typically handles its own field errors. #}
+    {# If you want to display WTForms errors, you'd iterate through form.errors or field.errors #}
     {% if error %}
-        {# Display any registration errors passed from the Flask route #}
         <p style="color: red;"><strong>Error:</strong> {{ error }}</p>
     {% endif %}
 
     <form action="{{ url_for('register') }}" method="post">
+        {# Add this line for CSRF protection! #}
+        {{ form.hidden_tag() }}
+
         <div>
             <label for="username">Username:</label>
-            {# The value="{{ username }}" pre-fills the field if there was an error #}
-            <input type="text" id="username" name="username" value="{{ username }}" required>
+            {# For WTForms, you typically render fields like form.username() #}
+            {# If you are manually creating inputs, you need to ensure they match form field names #}
+            <input type="text" id="username" name="username" value="{{ request.form.username }}" required> {# Use request.form to pre-fill #}
+            {% for error in form.username.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
         </div>
+        <br>
+
         <div>
             <label for="email">Email:</label>
-            {# Using type="email" for basic browser validation #}
-            <input type="email" id="email" name="email" value="{{ email }}" required>
+            <input type="email" id="email" name="email" value="{{ request.form.email }}" required>
+            {% for error in form.email.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
         </div>
+        <br>
+
         <div>
             <label for="password">Password:</label>
             <input type="password" id="password" name="password" required>
+            {% for error in form.password.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
         </div>
+        <br>
+
         <div>
             <label for="confirm_password">Confirm Password:</label>
             <input type="password" id="confirm_password" name="confirm_password" required>
+            {% for error in form.confirm_password.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
         </div>
+        <br>
+
+        {# Submit button #}
         <button type="submit">Register</button>
     </form>
 

@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>Add Medication</h1>
+
+    {% if error %}
+        {# Display any validation errors passed from the Flask route #}
+        <p style="color: red;"><strong>Error:</strong> {{ error }}</p>
+    {% endif %}
+
+    {# The form action points to the add_medication route #}
+    <form action="{{ url_for('add_medication') }}" method="post">
+        <div>
+            <label for="medication_name">Medication Name:</label>
+            {# Use 'medication_name_val' to pre-fill if there was an error #}
+            <input type="text" id="medication_name" name="medication_name" value="{{ medication_name_val }}" required>
+        </div>
+
+        <div>
+            <label for="dosage">Dosage:</label>
+            <input type="text" id="dosage" name="dosage" placeholder="e.g., 500mg, 1 tablet" value="{{ dosage_val }}">
+        </div>
+
+        <div>
+            <label for="frequency">Frequency:</label>
+            <input type="text" id="frequency" name="frequency" placeholder="e.g., Once daily, Twice a day" value="{{ frequency_val }}">
+        </div>
+
+        <div>
+            <label for="last_taken_date">Last Taken Date:</label>
+            {# Use 'last_taken_date_val' to pre-fill the date #}
+            <input type="date" id="last_taken_date" name="last_taken_date" value="{{ last_taken_date_val }}">
+        </div>
+
+        <div>
+            <label for="notes">Notes (Optional):</label>
+            {# Use 'notes_val' to pre-fill the textarea #}
+            <textarea id="notes" name="notes" rows="4" placeholder="e.g., Took with food...">{{ notes_val }}</textarea>
+        </div>
+
+        <button type="submit">Add Medication</button>
+        {# Optional: Add a cancel button that goes back to the medications list #}
+        <a href="{{ url_for('medications') }}" style="margin-left: 10px;">Cancel</a>
+    </form>
+{% endblock %}

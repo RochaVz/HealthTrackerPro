@@ -308,3 +308,142 @@ canvas {
     color: #888;
     font-style: italic;
 }
+
+/* ... (previous styles) ... */
+
+/* --- Styles for Edit/Delete Buttons --- */
+.edit-link {
+    color: #007bff; /* Blue for edit */
+    text-decoration: none;
+    font-weight: bold;
+    margin-right: 5px; /* Space between edit and delete */
+}
+.edit-link:hover {
+    text-decoration: underline;
+}
+
+.delete-button {
+    background-color: #dc3545; /* Red for delete */
+    color: white;
+    padding: 5px 10px; /* Smaller padding for buttons in list items */
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em; /* Slightly smaller font */
+}
+.delete-button:hover {
+    background-color: #c82333;
+}
+
+/* --- Adjustments for entry actions layout if needed --- */
+.entry-actions {
+    display: flex;
+    align-items: center;
+    margin-top: 10px; /* Space between header and actions */
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    gap: 5px; /* Space between items within actions */
+}
+
+/* Ensure date header doesn't interfere with actions on small screens */
+.entry-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 5px; /* Reduced margin */
+}
+
+/* Adjustments for summary list on dashboard to accommodate actions */
+.entry-list-summary li {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.entry-list-summary li .entry-header {
+    margin-bottom: 0;
+    flex-basis: auto; /* Let it size naturally */
+    margin-right: 15px; /* Space between date and details */
+}
+
+.entry-list-summary li .entry-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    flex-grow: 1; /* Allow details to take available space */
+    margin-right: 15px; /* Space between details and actions */
+}
+
+.entry-list-summary li .entry-actions {
+    margin-top: 0; /* Remove extra margin on summary list actions */
+}
+
+/* Ensure the delete button has some space from the edit link */
+.entry-list-summary li .entry-actions form {
+    margin-left: 10px;
+}
+/* --- Styles for Medication List --- */
+.medication-list {
+    list-style: none;
+    padding: 0;
+}
+
+.medication-list li {
+    background-color: #e0f7fa; /* Light blue background */
+    border: 1px solid #b2ebf2;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.med-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.med-header strong {
+    color: #00796b; /* Darker teal color */
+    font-size: 1.1em;
+}
+
+.med-details {
+    font-size: 0.95em;
+    flex-grow: 1;
+    display: flex;
+    flex-wrap: wrap; /* Allow details to wrap */
+    gap: 10px; /* Space between detail items */
+}
+
+.med-details span {
+    margin-right: 15px;
+    margin-bottom: 5px;
+}
+
+.med-notes p {
+    margin-top: 5px;
+    margin-bottom: 0;
+    padding-left: 10px;
+    border-left: 2px solid #00796b;
+    color: #444;
+    font-style: italic;
+}
+
+.med-actions {
+    margin-top: 10px;
+}
+
+.view-all-link {
+    color: #00796b; /* Teal color for links */
+    text-decoration: none;
+    font-weight: bold;
+}
+.view-all-link:hover {
+    text-decoration: underline;
+}

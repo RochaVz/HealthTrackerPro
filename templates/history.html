@@ -1,41 +1,186 @@
 {% extends 'base.html' %}
-{% block content %}
-    <h1>Health Entry History</h1>
+{% block title %}Health History{% endblock %}
 
-    {% if not entries %}
-        <p class="no-data-message">No health entries recorded yet. <a href="{{ url_for('add_entry') }}">Add your first entry!</a></p>
-    {% else %}
-        <ul class="entry-list">
-            {% for entry in entries %}
-                <li>
-                    <div class="entry-header">
-                        <strong>{{ entry.date.strftime('%Y-%m-%d') }}</strong>
-                        <!-- Optional: Add edit/delete links here later -->
-                    </div>
-                    <div class="entry-details">
-                        {% if entry.weight_kg is not none %}
-                            <span><strong>Weight:</strong> {{ "%.1f"|format(entry.weight_kg) }} kg</span>
-                        {% endif %}
-                        {% if entry.systolic_bp is not none and entry.diastolic_bp is not none %}
-                            <span><strong>BP:</strong> {{ entry.systolic_bp }}/{{ entry.diastolic_bp }} mmHg</span>
-                        {% elif entry.systolic_bp is not none %}
-                            <span><strong>BP (Systolic):</strong> {{ entry.systolic_bp }} mmHg</span>
-                        {% elif entry.diastolic_bp is not none %}
-                            <span><strong>BP (Diastolic):</strong> {{ entry.diastolic_bp }} mmHg</span>
-                        {% endif %}
-                        {% if entry.sleep_hours is not none %}
-                            <span><strong>Sleep:</strong> {{ "%.1f"|format(entry.sleep_hours) }} hrs</span>
-                        {% endif %}
-                        
-                        {% if entry.notes %}
-                            <div class="entry-notes">
-                                <strong>Notes:</strong>
-                                <p>{{ entry.notes }}</p>
-                            </div>
-                        {% endif %}
-                    </div>
-                </li>
+{% block content %}
+<div class="container mt-4"> {# Using Bootstrap classes for layout #}
+    <h2>Your Health History</h2>
+
+    {# Flash messages for success, danger, info, etc. #}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
             {% endfor %}
-        </ul>
+        {% endif %}
+    {% endwith %}
+
+    {# Sharing Buttons #}
+    <div class="mb-3">
+        <button id="share-whatsapp-btn" class="btn btn-success me-2">
+            Share History (Copy Text)
+        </button>
+        {# If you implement the shareable link, add a button for that too #}
+        {# <button id="share-link-btn" class="btn btn-info">Get Shareable Link</button> #}
+    </div>
+
+    {# Hidden textarea for copying text summary #}
+    <textarea id="history-text-summary" style="position: absolute; left: -9999px; top: -9999px;"></textarea>
+
+    {# Pagination controls (if implemented in the route) #}
+    {% if entries.has_pages %}
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                {% if entries.has_prev %}
+                    <li class="page-item"><a class="page-link" href="{{ url_for('history', page=entries.prev_num) }}">Previous</a></li>
+                {% endif %}
+                {% for page_num in entries.iter_pages() %}
+                    {% if page_num %}
+                        <li class="page-item {% if page_num == entries.page %}active{% endif %}">
+                            <a class="page-link" href="{{ url_for('history', page=page_num) }}">{{ page_num }}</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                    {% endif %}
+                {% endfor %}
+                {% if entries.has_next %}
+                    <li class="page-item"><a class="page-link" href="{{ url_for('history', page=entries.next_num) }}">Next</a></li>
+                {% endif %}
+            </ul>
+        </nav>
     {% endif %}
+
+    {# Health Entry Table #}
+    <div class="table-responsive"> {# Makes table scrollable on small screens #}
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">Date</th>
+                    <th scope="col">Weight (kg)</th>
+                    <th scope="col">Blood Pressure</th>
+                    <th scope="col">Sleep (hrs)</th>
+                    <th scope="col">Notes</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if entries.items %} {# Check if there are any entries on the current page #}
+                    {% for entry in entries.items %} {# Loop through entries for the current page #}
+                        <tr>
+                            <td>{{ entry.date.strftime('%Y-%m-%d') }}</td>
+                            <td>{{ entry.weight_kg | default('N/A') }}</td>
+                            <td>
+                                {# Corrected 'is not none' check for Jinja2 #}
+                                {% if entry.systolic_bp is not none and entry.diastolic_bp is not none %}
+                                    {{ entry.systolic_bp }}/{{ entry.diastolic_bp }} mmHg
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                            <td>{{ entry.sleep_hours | default('N/A') }}</td>
+                            <td>{{ entry.notes | truncate(50) | default('N/A') }}</td> {# Truncate long notes #}
+                            <td>
+                                {# Links for editing and deleting #}
+                                <a href="{{ url_for('edit_entry', entry_id=entry.id) }}" class="btn btn-sm btn-primary me-1">Edit</a>
+                                {# Delete button requires a form for POST request #}
+                                <form action="{{ url_for('delete_entry', entry_id=entry.id) }}" method="post" style="display:inline-block;">
+                                    {{ form.hidden_tag() }} {# Assuming 'form' is available in context, otherwise pass it or render CSRF manually #}
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this entry?');">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center">No health entries recorded yet.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    {# Pagination controls (if implemented in the route) #}
+    {% if entries.has_pages %}
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                {% if entries.has_prev %}
+                    <li class="page-item"><a class="page-link" href="{{ url_for('history', page=entries.prev_num) }}">Previous</a></li>
+                {% endif %}
+                {% for page_num in entries.iter_pages() %}
+                    {% if page_num %}
+                        <li class="page-item {% if page_num == entries.page %}active{% endif %}">
+                            <a class="page-link" href="{{ url_for('history', page=page_num) }}">{{ page_num }}</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                    {% endif %}
+                {% endfor %}
+                {% if entries.has_next %}
+                    <li class="page-item"><a class="page-link" href="{{ url_for('history', page=entries.next_num) }}">Next</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% endif %}
+
+</div>
+
+{# JavaScript for the WhatsApp sharing functionality #}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const shareWhatsappBtn = document.getElementById('share-whatsapp-btn');
+    const historyTextarea = document.getElementById('history-text-summary');
+
+    if (shareWhatsappBtn && historyTextarea) {
+        shareWhatsappBtn.addEventListener('click', function() {
+            // Fetch the text summary from the backend
+            fetch('/get_health_history_text')
+                .then(response => {
+                    if (!response.ok) {
+                        // Handle errors from the server (e.g., no entries)
+                        return response.json().then(err => { throw err; });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.text_summary) {
+                        // Set the text in the hidden textarea
+                        historyTextarea.value = data.text_summary;
+                        // Select the text
+                        historyTextarea.select();
+                        historyTextarea.setSelectionRange(0, 99999); // For mobile devices
+
+                        // Copy the text to the clipboard
+                        try {
+                            const successful = document.execCommand('copy');
+                            const msg = successful ? 'Health history copied to clipboard! Paste it into your WhatsApp chat.' : 'Failed to copy text.';
+                            alert(msg);
+                        } catch (err) {
+                            alert('Oops, unable to copy text automatically. Please copy it manually from the alert box.');
+                            // Optionally, display the text summary in an alert for manual copy
+                            prompt("Copy the following text:", data.text_summary);
+                        }
+
+                        // If you want to try opening WhatsApp directly (mobile best):
+                        // If data.whatsapp_share_url exists, you might uncomment this and adjust
+                        // For robustness, copying to clipboard is often preferred on web.
+                        // window.location.href = data.whatsapp_share_url;
+
+                    } else if (data.error) {
+                        alert('Error: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching or processing share data:', error);
+                    let errorMessage = 'Failed to fetch history for sharing.';
+                    if (error.error) { // If the server returned a JSON error
+                        errorMessage = `Error: ${error.error}`;
+                    }
+                    alert(errorMessage);
+                });
+        });
+    }
+});
+</script>
 {% endblock %}

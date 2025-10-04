@@ -2,27 +2,18 @@
 {% block content %}
     <h1>Dashboard</h1>
 
-    <!-- Display Flash Messages -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                {# Ensure you have CSS styles for these alert classes in static/style.css #}
-                <div class="alert alert-{{ category }}">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-    <!-- End Flash Messages -->
+    {# Flash Messages are handled in base.html, so they'll appear above the main content #}
 
     {% if current_user.is_authenticated %}
         <h2>Welcome, {{ current_user.username }}!</h2>
 
-        <!-- Recent Entries Summary -->
-        <h3>Your Most Recent Entries:</h3>
+        <!-- Recent Health Entries Summary -->
+        <h3>Your Most Recent Health Entries:</h3>
         {% if entries %}
             <ul class="entry-list-summary">
                 {% for entry in entries %}
                     <li>
-                        <div class="entry-header"> <!-- Re-using header for date -->
+                        <div class="entry-header">
                             <strong>{{ entry.date.strftime('%Y-%m-%d') }}</strong>
                         </div>
                         <div class="entry-details">
@@ -33,16 +24,16 @@
                                 <span>BP: {{ entry.systolic_bp }}/{{ entry.diastolic_bp }} mmHg</span>
                             {% elif entry.systolic_bp is not none %}
                                 <span>BP (Systolic): {{ entry.systolic_bp }} mmHg</span>
-                            {% elif entry.diastolic_bp is not none %}
+                            {% elif entry.diastolic_bp is not None %}
                                 <span>BP (Diastolic): {{ entry.diastolic_bp }} mmHg</span>
                             {% endif %}
                             {% if entry.sleep_hours is not none %}
                                 <span>Sleep: {{ "%.1f"|format(entry.sleep_hours) }} hrs</span>
                             {% endif %}
                         </div>
-                        <div class="entry-actions"> <!-- Container for actions -->
-                           <a href="{{ url_for('history') }}">View All</a>
-                           <!-- Add links for specific entry view/edit/delete here if implemented -->
+                        <div class="entry-actions">
+                           <a href="{{ url_for('history') }}" class="view-all-link">View All</a>
+                           {# Links for edit/delete would typically be on the history page, not here #}
                         </div>
                     </li>
                 {% endfor %}
@@ -94,18 +85,47 @@
                             }
                         },
                         responsive: true,
-                        maintainAspectRatio: false // Allows chart to fit container dimensions
+                        maintainAspectRatio: false, // Allows chart to fit container dimensions
+                        plugins: {
+                            legend: { display: false } // Hide legend if only one dataset
+                        }
                     }
                 });
             } else {
-                // If no data is available, display a message within the chart container
+                // If no data, display a message within the chart container
                 const chartContainer = document.querySelector('.chart-container');
                 chartContainer.innerHTML = '<p class="no-data-message">No weight data available for the last 30 days.</p>';
             }
         </script>
 
+        <!-- Recent Medication Logs -->
+        <h3>Your Recent Medications:</h3>
+        {% if med_logs %}
+            <ul class="medication-list-summary">
+                {% for med in med_logs %}
+                    <li>
+                        <div class="med-header">
+                            <strong>{{ med.medication_name }}</strong>
+                        </div>
+                        <div class="med-details">
+                            <span>Dosage: {{ med.dosage if med.dosage else 'N/A' }}</span>
+                            <span>Frequency: {{ med.frequency if med.frequency else 'N/A' }}</span>
+                            {% if med.last_taken_date %}
+                                <span>Last Taken: {{ med.last_taken_date.strftime('%Y-%m-%d') }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="med-actions">
+                           <a href="{{ url_for('medications') }}" class="view-all-link">View All</a>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No medications logged yet. <a href="{{ url_for('add_medication') }}">Add your first medication!</a></p>
+        {% endif %}
+
     {% else %}
-        <!-- View for users who are not logged in -->
+        <!-- If not logged in, prompt to login or register -->
         <p>Welcome to the Health Tracker!</p>
         <p>Please <a href="{{ url_for('login') }}">Login</a> or <a href="{{ url_for('register') }}">Register</a> to get started.</p>
     {% endif %} {# End of {% if current_user.is_authenticated %} #}
